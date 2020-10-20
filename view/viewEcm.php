@@ -122,12 +122,15 @@
 	}
 
 	function sign_received_message() {
+		var now = new Date();
+		document.getElementById("message_received_time").value = now;
+
 		var req = new XMLHttpRequest();
 		req.open("POST", "https://mur1.de/mur1/Ecm/?sign=1");
 		req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 req.addEventListener("load", sign_received_message_res);
                 data = {
-                                data     : document.getElementById("received_message").value,
+                                data     : document.getElementById("received_message").value + now,
                                 privkey  : document.getElementById("r_privkey").value
                         };
                 req.send(JSON.stringify(data));
@@ -136,6 +139,7 @@
 	//Send Receipt
 	function send_receipt() {
 		document.getElementById("receipt").value = document.getElementById("message_received_sig").value;
+		document.getElementById("receipt_time").value = document.getElementById("message_received_time").value;;
 	}
 
 	//Verify Message Received Sig
@@ -143,9 +147,11 @@
 		if (this.response === "false" || this.response === "error") {
 			document.getElementById("received_message").style.backgroundColor = "#ff0000";
                         document.getElementById("receipt").style.backgroundColor = "#ff0000";
+			document.getElementById("receipt_time").style.backgroundColor = "#ff0000";
                 } else if (this.response === "true") {
 			document.getElementById("received_message").style.backgroundColor = "#00ff00";
                         document.getElementById("receipt").style.backgroundColor = "#00ff00";
+			document.getElementById("receipt_time").style.backgroundColor = "#00ff00";
                 }
 	}
 
@@ -155,7 +161,7 @@
                 req.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
                 req.addEventListener("load", verify_message_received_sig_res);
                 data = {
-                        data   : document.getElementById("message").value,
+                        data   : document.getElementById("message").value + document.getElementById("receipt_time").value,
                         sig    : document.getElementById("receipt").value,
                         pubkey : document.getElementById("r_pubkey").value
                 };
@@ -167,39 +173,39 @@
 <div class="headline">ECM - electronic certified mail</div>
 <div class="privacy">
 Keysize:
-	<input type="text" id="keysize" value=512 /><br>
+	<input type="text" id="keysize" value=512 /><br><br>
 
-<table border="1" width="100%">
+<table border="1" style="border-spacing: 5px;">
 	<tr>
-		<td><b>Recipient</b></td>
-		<td><b>Sender</b></td>
+		<td style="padding: 5px; text-align: center;"><b>Recipient</b></td>
+		<td style="padding: 5px; text-align: center;"><b>Sender</b></td>
 	</tr>
 	<tr>
 		<td colspan=2 style="font-size:10px"><center>Private Keys (not published)</center></td>
 	<tr>
-		<td><button onclick="javascript:generate_key('recipient')">Create Key</button><br><textarea rows=5 style="width:300px;" id="r_privkey"></textarea></td>
-		<td><button onclick="javascript:generate_key('sender')">Create Key</button><br><textarea rows=5 style="width:300px;" id="s_privkey"></textarea></td>
+		<td style="padding: 5px; text-align: center;"><button onclick="javascript:generate_key('recipient')">Create Key</button><br><textarea rows=5 style="width:300px;" id="r_privkey"></textarea></td>
+		<td style="padding: 5px; text-align: center;"><button onclick="javascript:generate_key('sender')">Create Key</button><br><textarea rows=5 style="width:300px;" id="s_privkey"></textarea></td>
 	</tr>
 	<tr>
-		<td colspan=2 style="font-size:10px"><center>Public Keys & Signature (published/set from respective party)</center></td>
+		<td colspan=2 style="font-size:10px"><center><span style="background-color: #aabbcc;">Public</span> Keys & Signature (published/set from respective party)</center></td>
 	</tr>
-	<tr>
-		<td>
+	<tr style="border-color:#bbccdd; background-color: #aabbcc;">
+		<td style="padding: 5px; text-align: center;">
 			<textarea rows=5 style="width:300px;" id="r_pubkey"></textarea><br>
 			<textarea rows=5 style="width:300px;" id="r_pubkey_sig"></textarea>
 		</td>
-		<td>
+		<td style="padding: 5px; text-align: center;">
 			<textarea rows=5 style="width:300px;" id="s_pubkey"></textarea><br>
 			<textarea rows=5 style="width:300px;" id="s_pubkey_sig"></textarea>
 		</td>
 	</tr>
 	<tr>
-		<td><center><button onclick="javascript:verify_key('sender')">Verify Sender Key &#8599;</button></center></td>
-		<td><center><button onclick="javascript:verify_key('recipient')">&#8598; Verify Recipient Key</button></center></td>
+		<td style="padding: 5px; text-align: center;"><center><button onclick="javascript:verify_key('sender')">Verify Sender Key &#8599;</button></center></td>
+		<td style="padding: 5px; text-align: center;"><center><button onclick="javascript:verify_key('recipient')">&#8598; Verify Recipient Key</button></center></td>
 	</tr>
 	<tr>
-		<td></td>
-		<td>
+		<td style="padding: 5px; text-align: center;"></td>
+		<td style="padding: 5px; text-align: center;">
 			<center>
 				<b>Message</b><br>
 				<textarea rows=5 style="width:300px;" id="message"></textarea>
@@ -207,29 +213,29 @@ Keysize:
 		</td>
 	</tr>
 	<tr>
-		<td></td>
-		<td><button onclick="javascript:sign_message()">Sign Message</button><input id="message_sig" /></td>
+		<td style="padding: 5px; text-align: center;"></td>
+		<td style="padding: 5px; text-align: center;"><button onclick="javascript:sign_message()">Sign Message</button><br><input id="message_sig" /></td>
 	</tr>
 	<tr>
-		<td><b>Received Message</b><br><textarea rows=5 style="width:300px;" id="received_message"></textarea><br><input id="received_message_sig"</td>
-		<td><button onclick="javascript:send_message()">&#8592; Send message and signature to Recipient</button></td>
+		<td style="padding: 5px; text-align: center;"><center><b>Received Message</b><br><textarea rows=5 style="width:300px;" id="received_message"></textarea><br><input id="received_message_sig"></center></td>
+		<td style="padding: 5px; text-align: center;"><button onclick="javascript:send_message()">&#8592; Send message and signature to Recipient</button></td>
 	</tr>
 	<tr>
-		<td><button onclick="javascript:verify_message_and_sender()">Verify Message & Sender</button></td>
-		<td></td>
+		<td style="padding: 5px; text-align: center;"><button onclick="javascript:verify_message_and_sender()">Verify Message & Sender</button></td>
+		<td style="padding: 5px; text-align: center;"></td>
 	</tr>
 	<tr>
-		<td><button onclick="javascript:sign_received_message()">Sign Received Message</button><input id="message_received_sig"></td>
-		<td></td>
+		<td style="padding: 5px; text-align: center;"><button onclick="javascript:sign_received_message()">Sign Received Message</button><br><input id="message_received_sig"><br><input id="message_received_time"</td>
+		<td style="padding: 5px; text-align: center;"></td>
 	</tr>
 	<tr>
-		<td><button onclick="javascript:send_receipt()">Send "Message Received Signature" to Message Sender</button></td>
-		<td><input id="receipt"></td>
+		<td style="padding: 5px; text-align: center;"><button onclick="javascript:send_receipt()">Send receipt and receipt-time to Sender &#8594;</button></td>
+		<td style="padding: 5px; text-align: center;"><input id="receipt"><br><input id="receipt_time"</td>
 	</tr>
 	<tr>
-		<td></td>
-		<td>
-			<button onclick="javascript:verify_message_received_sig()">Verify "Message Reiceived Signature" is from Receiver</button>
+		<td style="padding: 5px; text-align: center;"></td>
+		<td style="padding: 5px; text-align: center;">
+			<button onclick="javascript:verify_message_received_sig()">Verify "Message Received"</button>
 		</td>
 	</tr>
 </table>
